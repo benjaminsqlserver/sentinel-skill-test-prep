@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="PageAccessKata/PageAccessKata.csproj" />
+  <Project Path="PageAccessKata.Tests/PageAccessKata.Tests.csproj" />
+  <Project Path="AccessLogKata/AccessLogKata.csproj" />
+  <Project Path="AccessLogKata.Tests/AccessLogKata.Tests.csproj" />
+</Solution>

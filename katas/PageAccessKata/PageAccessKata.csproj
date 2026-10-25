@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- A kata: no references, no packages. Exactly what a timed test gives you. -->
+</Project>

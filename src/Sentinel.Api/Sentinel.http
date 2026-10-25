@@ -1,0 +1,63 @@
+# Requests for the Sentinel API. Open in Visual Studio, Rider or VS Code
+# (REST Client extension) and click "Send Request" above each one.
+# The X-Demo-User header is the development-only identity (Chapter 12).
+
+@api = http://localhost:5080
+@admin = ada.okafor@sentinel.dev
+
+### Who am I?
+GET {{api}}/api/me
+X-Demo-User: {{admin}}
+
+### My menu (try with and without the header)
+GET {{api}}/api/me/navigation
+X-Demo-User: emeka.nwosu@sentinel.dev
+
+### May Emeka open the ledger export? (no: explicitly denied)
+GET {{api}}/api/me/page-access?path=/reports/finance/export
+X-Demo-User: emeka.nwosu@sentinel.dev
+
+### Is my account safe?
+GET {{api}}/api/me/security
+X-Demo-User: tunde.bakare@sentinel.dev
+
+### Simulate the identity provider: a failed sign-in from Frankfurt
+POST {{api}}/api/sign-ins
+X-Demo-User: {{admin}}
+Content-Type: application/json
+
+{
+  "email": "femi.bello@sentinel.dev",
+  "occurredAt": "{{$datetime iso8601}}",
+  "ipAddress": "185.220.101.9",
+  "userAgent": "curl/8.9.1",
+  "succeeded": false,
+  "failureReason": "WrongPassword"
+}
+
+### A timestamp without a zone is accepted by DateTimeOffset as LOCAL time
+### on the server. Compare with the request above and read Chapter 22.
+POST {{api}}/api/sign-ins
+X-Demo-User: {{admin}}
+Content-Type: application/json
+
+{
+  "email": "femi.bello@sentinel.dev",
+  "occurredAt": "2026-10-25T09:00:00",
+  "ipAddress": "185.220.101.9",
+  "succeeded": true
+}
+
+### Validation problem (400 with one entry per field)
+POST {{api}}/api/users
+X-Demo-User: {{admin}}
+Content-Type: application/json
+
+{ "email": "", "displayName": "", "timeZoneId": "Africa/Lagos" }
+
+### Forbidden: an auditor may read users but not create them
+POST {{api}}/api/users
+X-Demo-User: femi.bello@sentinel.dev
+Content-Type: application/json
+
+{ "email": "new.person@sentinel.dev", "displayName": "New Person", "timeZoneId": "Africa/Lagos" }

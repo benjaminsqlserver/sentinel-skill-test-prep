@@ -1,4 +1,4 @@
-﻿using Sentinel.Domain.Access;
+using Sentinel.Domain.Access;
 using Sentinel.Domain.Pages;
 using Sentinel.Domain.Security;
 

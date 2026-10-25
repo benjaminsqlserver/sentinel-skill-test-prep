@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Sentinel.Application.Abstractions.Messaging;
 
 namespace Sentinel.Architecture.Tests;

@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The wire format. DTOs only: no logic, no references, no packages.
+       The Angular models in client/sentinel-web/src/app/core/models mirror
+       this assembly by hand, which is why it is kept small and flat. -->
+  <PropertyGroup>
+    <RootNamespace>Sentinel.Contracts</RootNamespace>
+  </PropertyGroup>
+
+</Project>

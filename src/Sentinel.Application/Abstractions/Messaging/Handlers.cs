@@ -1,0 +1,23 @@
+using Sentinel.Domain.Common;
+
+namespace Sentinel.Application.Abstractions.Messaging;
+
+/// <summary>
+/// The one interface the dispatcher knows about. The three below exist so a
+/// handler's declaration says what kind of request it serves.
+/// </summary>
+public interface IRequestHandler<in TRequest, TResponse>
+    where TRequest : IRequest<TResponse>
+    where TResponse : Result
+{
+    Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken);
+}
+
+public interface ICommandHandler<in TCommand> : IRequestHandler<TCommand, Result>
+    where TCommand : ICommand;
+
+public interface ICommandHandler<in TCommand, TValue> : IRequestHandler<TCommand, Result<TValue>>
+    where TCommand : ICommand<TValue>;
+
+public interface IQueryHandler<in TQuery, TValue> : IRequestHandler<TQuery, Result<TValue>>
+    where TQuery : IQuery<TValue>;

@@ -1,0 +1,23 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+TestResults/
+
+# Node / Angular
+node_modules/
+client/sentinel-web/dist/
+client/sentinel-web/.angular/
+.angular/
+
+# Book build intermediates (dist/ IS committed)
+book/build/
+
+# Local databases
+*.db
+*.db-shm
+*.db-wal
+
+# The Woven prep guide is the candidate's personal copy; it is not ours to redistribute.
+WovenAnglar.pdf

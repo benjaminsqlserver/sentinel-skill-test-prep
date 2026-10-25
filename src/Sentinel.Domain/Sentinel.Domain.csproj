@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The Domain references nothing but the base class library.
+       If you are about to add a PackageReference here, stop: the concept
+       you want almost certainly belongs in Application as a port. -->
+  <PropertyGroup>
+    <RootNamespace>Sentinel.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sentinel.Domain.Tests" />
+  </ItemGroup>
+
+</Project>

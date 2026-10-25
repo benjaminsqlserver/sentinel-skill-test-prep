@@ -11,10 +11,10 @@ Nothing has been investigated yet. Start a copy of
 **Customer:** Bola Adeyemi (bola.adeyemi@sentinel.dev), Finance Manager
 
 > Hi team, customer says the times on the Account security page are wrong.
-> Quote from her email: *"I signed in at 9 this morning and it says 8. The
-> page also says it was 'checked 1 hour ago' even though I'd just opened
-> it. Is someone else in my account??"* She's quite worried because of the
-> red banner. I tried it as myself and the times look fine to me?? Not sure
+> Quote from her email: *"I always sign in at 9 when I get to the office and
+> the page says 8:00. It also says I signed in from London at 8:40 on Friday.
+> I have never been to London and at 8:40 I was on the bus. Is someone else
+> in my account??"* She is quite worried because of the red banner. I tried it as myself and the times look fine to me?? Not sure
 > if related but we deployed the "EF Core housekeeping" change on Tuesday.
 > Screenshot attached (not attached).
 >

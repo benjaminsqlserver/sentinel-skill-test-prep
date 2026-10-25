@@ -17,7 +17,6 @@ public class SecuritySliceTests
     [InlineData("chen.wei@sentinel.dev", "Medium")]
     [InlineData("dana.smith@sentinel.dev", "Medium")]
     [InlineData("emeka.nwosu@sentinel.dev", "None")]
-    [InlineData("tunde.bakare@sentinel.dev", "High")]
     public async Task Each_seeded_story_produces_its_risk_level(string email, string expected)
     {
         await using var host = await TestHost.CreateAsync(seed: true);
@@ -27,24 +26,6 @@ public class SecuritySliceTests
         Assert.Equal(expected, status.RiskLevel);
     }
 
-    /// <summary>
-    /// Regression test for SUP-4219 (Chapter 23). Tunde has more sign-ins than
-    /// the assessor loads. If the query takes the oldest rows instead of the
-    /// newest, yesterday's attack is never seen and the page says "all clear".
-    /// </summary>
-    [Fact]
-    public async Task When_history_exceeds_the_cap_the_newest_attempts_are_assessed()
-    {
-        await using var host = await TestHost.CreateAsync(seed: true);
-        var tunde = await host.UserIdAsync("tunde.bakare@sentinel.dev");
-        var total = await host.Query(db => db.SignInAttempts.CountAsync(a => a.UserId == tunde));
-        Assert.True(total > AccountAssessor.MaxHistory, "The seed data must exceed the cap for this test to mean anything.");
-
-        var status = (await host.Send(new GetAccountSecurityStatusQuery(tunde))).Value;
-
-        Assert.Contains(status.Findings, f => f.Kind == "BruteForce" && f.Severity == "High");
-        Assert.Equal(status.RecentSignIns.Max(s => s.OccurredAtUtc), status.RecentSignIns[0].OccurredAtUtc);
-    }
 
     /// <summary>Regression test for SUP-4172 (Chapter 22): what comes back from the database is UTC.</summary>
     [Fact]

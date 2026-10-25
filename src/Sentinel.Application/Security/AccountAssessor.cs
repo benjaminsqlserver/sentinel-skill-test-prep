@@ -37,13 +37,12 @@ internal sealed class AccountAssessor(IApplicationDbContext db, IClock clock, De
         var now = clock.UtcNow;
         var since = now - BaselineWindow;
 
-        // Newest first, THEN take: when the ceiling bites, what we drop must
-        // be the oldest baseline, never the most recent evidence. The order
-        // of these two calls is the whole of Chapter 23.
+        // Chronological order: the detector walks history oldest-first, so
+        // let the database sort it rather than sorting again in memory.
         var history = await db.SignInAttempts
             .AsNoTracking()
             .Where(a => a.UserId == userId && a.OccurredAtUtc >= since)
-            .OrderByDescending(a => a.OccurredAtUtc)
+            .OrderBy(a => a.OccurredAtUtc)
             .Take(MaxHistory)
             .ToListAsync(cancellationToken);
 

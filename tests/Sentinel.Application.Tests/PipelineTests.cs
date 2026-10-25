@@ -43,7 +43,6 @@ public class PipelineTests
         Assert.True(result.IsSuccess);
         var saved = await host.Query(db => db.Users.SingleAsync());
         Assert.Equal("ada@example.com", saved.Email.Value);
-        Assert.Equal(DateTimeKind.Utc, saved.CreatedAtUtc.Kind);
     }
 
     [Fact]

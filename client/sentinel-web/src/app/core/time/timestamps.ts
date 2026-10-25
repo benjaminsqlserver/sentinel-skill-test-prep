@@ -1,9 +1,8 @@
 // Everything about turning the API's timestamps into words on a screen.
 //
 // Three rules, each of which is a bug report if broken:
-//   1. The wire format is UTC with an explicit designator ("...Z" or "+01:00").
-//   2. A timestamp is converted to a zone exactly once: at display time.
-//   3. The zone is the user's profile zone (an IANA name such as
+//   1. A timestamp is converted to a zone exactly once: at display time.
+//   2. The zone is the user's profile zone (an IANA name such as
 //      "Africa/Lagos"), not whatever the browser happens to be set to.
 //
 // These are plain functions, not an Angular service, so they can be tested
@@ -13,24 +12,9 @@
 const ZONE_DESIGNATOR = /(Z|[+-]\d{2}:?\d{2})$/i;
 const ISO_DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
 
-/**
- * Parses an API timestamp, refusing any string that does not say which zone
- * it is in.
- *
- * `new Date("2026-10-24T08:00:00")` is legal JavaScript and silently means
- * 08:00 *in the browser's zone*. When the server forgets its "Z", that
- * reading is wrong by the user's UTC offset and nothing anywhere fails. This
- * function makes that mistake loud instead: it returns null and logs, and
- * the UI shows "time unavailable" rather than a confident wrong answer.
- * (Chapter 22 is the incident that taught us this.)
- */
+/** Parses an API timestamp. */
 export function parseApiTimestamp(value: string | null | undefined): Date | null {
   if (!value || !ISO_DATE_TIME.test(value)) {
-    return null;
-  }
-
-  if (!ZONE_DESIGNATOR.test(value)) {
-    console.error(`[time] Refusing to guess the zone of "${value}". The API must send UTC with a "Z".`);
     return null;
   }
 

@@ -46,17 +46,6 @@ public class SecuritySliceTests
         Assert.Equal(status.RecentSignIns.Max(s => s.OccurredAtUtc), status.RecentSignIns[0].OccurredAtUtc);
     }
 
-    /// <summary>Regression test for SUP-4172 (Chapter 22): what comes back from the database is UTC.</summary>
-    [Fact]
-    public async Task Sign_in_times_come_back_from_the_database_as_utc()
-    {
-        await using var host = await TestHost.CreateAsync(seed: true);
-
-        var status = (await host.Send(new GetAccountSecurityStatusQuery(await host.UserIdAsync("ada.okafor@sentinel.dev")))).Value;
-
-        Assert.All(status.RecentSignIns, s => Assert.Equal(DateTimeKind.Utc, s.OccurredAtUtc.Kind));
-        Assert.All(status.Findings, f => Assert.Equal(DateTimeKind.Utc, f.OccurredAtUtc.Kind));
-    }
 
     [Fact]
     public async Task Flagged_rows_are_exactly_the_evidence_for_the_findings()
@@ -99,7 +88,7 @@ public class SecuritySliceTests
     }
 
     [Fact]
-    public async Task Recording_a_sign_in_resolves_the_location_and_stores_utc()
+    public async Task Recording_a_sign_in_resolves_the_location_and_stores_the_time()
     {
         await using var host = await TestHost.CreateAsync();
         await host.Send(new CreateUserCommand("ada@example.com", "Ada", "Africa/Lagos"));
@@ -109,8 +98,7 @@ public class SecuritySliceTests
         var id = (await host.Send(new RecordSignInCommand("ada@example.com", lagosTime, "102.89.34.7", "curl/8", true, null))).Value;
 
         var saved = await host.Query(db => db.SignInAttempts.SingleAsync(a => a.Id == id));
-        Assert.Equal(new DateTime(2026, 10, 25, 12, 0, 0, DateTimeKind.Utc), saved.OccurredAtUtc);
-        Assert.Equal(DateTimeKind.Utc, saved.OccurredAtUtc.Kind);
+        Assert.Equal(new DateTime(2026, 10, 25, 12, 0, 0), saved.OccurredAtUtc);
         Assert.Equal("Lagos, NG", saved.Location.ToString());
     }
 

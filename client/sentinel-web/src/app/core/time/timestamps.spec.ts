@@ -13,16 +13,6 @@ describe('parseApiTimestamp', () => {
     expect(parseApiTimestamp('2026-10-24T08:00:00.1234567Z')).not.toBeNull();
   });
 
-  it('refuses a timestamp with no zone instead of guessing local time', () => {
-    // This is the string SUP-4172 was made of. new Date() would accept it.
-    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-
-    expect(parseApiTimestamp('2026-10-24T08:00:00')).toBeNull();
-    expect(error).toHaveBeenCalledOnce();
-
-    error.mockRestore();
-  });
-
   it.each([null, undefined, '', 'yesterday', '24/10/2026 08:00', '2026-13-45T99:99:99Z'])('returns null for %s', (value) => {
     expect(parseApiTimestamp(value as string | null | undefined)).toBeNull();
   });

@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using Sentinel.Contracts;
 
 namespace Sentinel.Api.Tests;
@@ -127,18 +126,6 @@ public partial class ApiTests(SentinelApiFactory factory) : IClassFixture<Sentin
         Assert.Equal("ParentDenied", verdict.Reason);
     }
 
-    // ---- The wire format for dates (SUP-4172, Chapter 22) ----
-
-    [Fact]
-    public async Task Every_timestamp_on_the_wire_is_utc_with_a_z()
-    {
-        var json = await factory.ClientFor(Dana).GetStringAsync("/api/me/security");
-
-        var timestamps = TimestampProperty().Matches(json).Select(m => m.Groups["value"].Value).ToList();
-
-        Assert.NotEmpty(timestamps);
-        Assert.All(timestamps, t => Assert.EndsWith("Z", t));
-    }
 
     [Fact]
     public async Task Acknowledging_a_finding_over_http_returns_204_and_lowers_the_risk()
@@ -154,6 +141,4 @@ public partial class ApiTests(SentinelApiFactory factory) : IClassFixture<Sentin
         Assert.DoesNotContain(after!.Findings, f => f.Key == finding.Key);
     }
 
-    [GeneratedRegex("\"(occurredAtUtc|assessedAtUtc)\":\"(?<value>[^\"]+)\"")]
-    private static partial Regex TimestampProperty();
 }

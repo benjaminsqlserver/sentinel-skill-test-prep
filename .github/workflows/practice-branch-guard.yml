@@ -1,0 +1,33 @@
+# The lab/* and drill/* branches are exercises: each one breaks the code on
+# purpose (a planted bug, removed regression tests, emptied components) and
+# carries a TICKET.md or DRILL.md describing the exercise. They must never be
+# merged into main. This check fails any pull request that would bring one in;
+# branch protection on main makes it a required check.
+name: Practice branch guard
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  guard:
+    name: guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Refuse practice-branch content
+        run: |
+          found=0
+          for f in TICKET.md DRILL.md; do
+            if [ -e "$f" ]; then
+              echo "::error file=$f::$f marks a practice branch (lab/* or drill/*). Practice branches are exercises and must not be merged into main."
+              found=1
+            fi
+          done
+          case "${{ github.head_ref }}" in
+            lab/*|drill/*)
+              echo "::error::'${{ github.head_ref }}' is a practice branch. Check it out and work on it locally; do not merge it into main."
+              found=1 ;;
+          esac
+          exit $found

@@ -95,6 +95,11 @@ always shows the code that is in the repository.
 | `lab/SUP-4219-all-clear` | Lab 2 (Chapter 23): reproduce and fix a missed attack |
 | `drill/angular-security-start` | Chapter 25: rebuild the security page components against the clock |
 
+**Never merge a `lab/*` or `drill/*` branch into `main`.** Each one breaks the
+code on purpose. Check it out, do the exercise locally, and compare your fix
+with `main`. A required check (`.github/workflows/practice-branch-guard.yml`)
+fails any pull request that would bring one in.
+
 ## Licence
 
 Code: MIT. Book text © 2026 Benjamin Fadina.

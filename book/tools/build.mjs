@@ -18,6 +18,8 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { readZip, writeZip } from './zip.mjs';
+
 const here = dirname(fileURLToPath(import.meta.url));
 const bookDir = resolve(here, '..');
 const repoRoot = resolve(bookDir, '..');
@@ -83,6 +85,42 @@ function pandoc(args) {
   execFileSync('pandoc', args, { stdio: 'inherit', cwd: bookDir });
 }
 
+// Pandoc writes the Word table of contents as an empty field for Word to fill
+// in on opening. Viewers that never update fields (LibreOffice, Google Docs,
+// phones) would show a blank page, so pre-fill the field with a hyperlinked
+// entry per chapter and section. The field stays dirty, so Word still rebuilds
+// it, with page numbers, when the document is opened.
+function fillTableOfContents(docx) {
+  const entries = readZip(readFileSync(docx));
+  let xml = entries.get('word/document.xml').toString('utf8');
+
+  const toc = [];
+  xml = xml.replace(/<w:p><w:pPr><w:pStyle w:val="Heading([12])" \/><\/w:pPr>([\s\S]*?)<\/w:p>/g, (_m, level, body) => {
+    const name = `_TocSentinel${toc.length + 1}`;
+    const text = [...body.matchAll(/<w:t(?: [^>]*)?>([^<]*)<\/w:t>/g)].map((m) => m[1]).join('');
+    toc.push({ level, name, text });
+    const id = 9000 + toc.length;
+    return `<w:p><w:pPr><w:pStyle w:val="Heading${level}" /></w:pPr><w:bookmarkStart w:id="${id}" w:name="${name}" />${body}<w:bookmarkEnd w:id="${id}" /></w:p>`;
+  });
+
+  const field = /<w:p><w:r><w:fldChar w:fldCharType="begin" w:dirty="true" \/><w:instrText xml:space="preserve">(TOC [^<]*)<\/w:instrText><w:fldChar w:fldCharType="separate" \/><w:fldChar w:fldCharType="end" \/><\/w:r><\/w:p>/;
+  const match = xml.match(field);
+  if (!match || toc.length === 0) {
+    throw new Error('docx: table of contents field or headings not found; pandoc output changed');
+  }
+
+  const begin = `<w:r><w:fldChar w:fldCharType="begin" w:dirty="true" /></w:r><w:r><w:instrText xml:space="preserve">${match[1]}</w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate" /></w:r>`;
+  const paragraphs = toc.map((entry, i) =>
+    `<w:p><w:pPr><w:pStyle w:val="TOC${entry.level}" /></w:pPr>${i === 0 ? begin : ''}`
+    + `<w:hyperlink w:anchor="${entry.name}" w:history="1"><w:r><w:rPr><w:rStyle w:val="Hyperlink" /></w:rPr><w:t xml:space="preserve">${entry.text}</w:t></w:r></w:hyperlink></w:p>`);
+  paragraphs.push('<w:p><w:r><w:fldChar w:fldCharType="end" /></w:r></w:p>');
+  xml = xml.replace(field, paragraphs.join(''));
+
+  entries.set('word/document.xml', Buffer.from(xml, 'utf8'));
+  writeFileSync(docx, writeZip(entries));
+  console.log(`docx: contents pre-filled with ${toc.length} entries`);
+}
+
 function findChrome() {
   const candidates = [
     process.env.CHROME_PATH,
@@ -109,7 +147,13 @@ function buildOutputs(markdownFile) {
   pandoc([...common, '--css', css, '--split-level=1', '-o', join(distDir, `${baseName}.epub`)]);
   console.log(`epub: ${join(distDir, `${baseName}.epub`)}`);
 
-  pandoc([...common, '-o', join(distDir, `${baseName}.docx`)]);
+  // Styles come from assets/reference.docx (regenerate with make-reference-docx.mjs).
+  const docx = join(distDir, `${baseName}.docx`);
+  pandoc([
+    ...common, '--reference-doc', join(bookDir, 'assets', 'reference.docx'),
+    '--lua-filter', join(here, 'docx.lua'), '-o', docx,
+  ]);
+  fillTableOfContents(docx);
   console.log(`docx: ${join(distDir, `${baseName}.docx`)}`);
 
   const chrome = findChrome();

@@ -1,0 +1,64 @@
+/* Screen and print styles for the HTML/PDF/EPUB editions. */
+@page { size: A4; margin: 18mm 16mm 20mm; }
+
+html { font-size: 11pt; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  line-height: 1.55;
+  color: #1d2733;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+header#title-block-header { text-align: center; padding: 8rem 0 6rem; break-after: page; }
+header#title-block-header .title { font-size: 3rem; margin: 0; letter-spacing: .04em; }
+header#title-block-header .subtitle { font-size: 1.2rem; font-weight: 400; color: #435163; margin: 1rem auto 3rem; max-width: 34rem; }
+header#title-block-header .author { font-size: 1.15rem; font-weight: 600; }
+header#title-block-header .date { color: #5d6b7a; }
+
+nav#TOC { break-after: page; }
+nav#TOC ul { list-style: none; padding-left: 1rem; }
+nav#TOC > ul { padding-left: 0; }
+nav#TOC > ul > li { margin-top: .4rem; font-weight: 600; }
+nav#TOC > ul > li li { font-weight: 400; }
+nav#TOC a { text-decoration: none; color: inherit; }
+
+h1 { font-size: 1.9rem; margin-top: 0; padding-top: 1rem; break-before: page; color: #14213d; }
+h2 { font-size: 1.35rem; margin-top: 2rem; color: #14213d; break-after: avoid; }
+h3 { font-size: 1.1rem; margin-top: 1.5rem; break-after: avoid; }
+p, li { orphans: 3; widows: 3; }
+
+a { color: #1f5fbf; }
+
+code { font-family: "Cascadia Code", Consolas, ui-monospace, monospace; font-size: .86em; background: #eef1f5; padding: .05em .25em; border-radius: 3px; }
+pre { background: #f6f8fa; border: 1px solid #dfe3e8; border-radius: 6px; padding: .75rem .9rem; font-size: .76rem; line-height: 1.42; break-inside: auto;
+      /* Wrap rather than clip: a printed page cannot scroll sideways. */
+      white-space: pre-wrap; overflow-wrap: anywhere; }
+code, pre { font-variant-ligatures: none; } /* show => as typed, not as an arrow glyph */
+pre code { white-space: inherit; }
+/* Pandoc's highlighting CSS sets white-space: pre and inline-block lines; undo both. */
+pre > code.sourceCode { white-space: pre-wrap !important; }
+pre > code.sourceCode > span { display: inline !important; white-space: pre-wrap; }
+div.sourceCode { overflow: visible !important; }
+pre code { background: none; padding: 0; font-size: inherit; }
+.listing-path { font-family: "Cascadia Code", Consolas, monospace; font-size: .78rem; font-weight: 600; color: #fff; background: #14213d; display: inline-block; padding: .15rem .6rem; border-radius: 5px 5px 0 0; margin: 1rem 0 -1rem; }
+.listing-path + div.sourceCode pre, .listing-path + pre { border-top-left-radius: 0; }
+
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 4px solid #1f5fbf; background: #f1f5fc; color: #263445; }
+blockquote p { margin: .3rem 0; }
+
+table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .9rem; break-inside: avoid; }
+th, td { border: 1px solid #dfe3e8; padding: .35rem .55rem; text-align: left; vertical-align: top; }
+th { background: #eef1f5; }
+
+.callout, div.tip, div.warning, div.exam { border-radius: 6px; padding: .6rem 1rem; margin: 1rem 0; break-inside: avoid; }
+div.tip { background: #e7f5ec; border-left: 5px solid #1e7b45; }
+div.warning { background: #fff4e0; border-left: 5px solid #b26a00; }
+div.exam { background: #f3eefc; border-left: 5px solid #6941c6; }
+div.tip > p:first-child::before { content: "Tip — "; font-weight: 700; }
+div.warning > p:first-child::before { content: "Watch out — "; font-weight: 700; }
+div.exam > p:first-child::before { content: "On the test — "; font-weight: 700; }
+
+img { max-width: 100%; }
+hr { border: none; border-top: 1px solid #dfe3e8; margin: 2rem 0; }
